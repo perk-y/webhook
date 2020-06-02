@@ -1,0 +1,44 @@
+plugins {
+	id 'org.springframework.boot' version '2.3.0.RELEASE'
+	id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+	id 'java'
+}
+
+group = 'com.lattice'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation('org.springframework.boot:spring-boot-starter-test') {
+		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+	}
+
+	compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
+// https://mvnrepository.com/artifact/com.h2database/h2
+	//runtime group: 'com.h2database', name: 'h2', version: '1.4.200'
+	implementation 'org.eclipse.mylyn.github:org.eclipse.egit.github.core:2.1.5'
+	implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+// https://mvnrepository.com/artifact/com.google.api-client/google-api-client
+	compile group: 'com.google.api-client', name: 'google-api-client', version: '1.30.4'
+// https://mvnrepository.com/artifact/com.google.oauth-client/google-oauth-client-jetty
+	compile group: 'com.google.oauth-client', name: 'google-oauth-client-jetty', version: '1.30.4'
+// https://mvnrepository.com/artifact/com.google.apis/google-api-services-sheets
+	compile group: 'com.google.apis', name: 'google-api-services-sheets', version: 'v4-rev580-1.25.0'
+}
+
+test {
+	useJUnitPlatform()
+}
