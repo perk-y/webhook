@@ -82,7 +82,7 @@ class SheetsQuickstart {
     System.out.printf("%d cells updated.", result.getUpdates().getUpdatedCells());
   }
 
-  void updateAssignees(String spreadsheetId, ArrayList assigneeList, int issueNumber)
+  void updateAssignees(String spreadsheetId, String assigneeList, int issueNumber)
       throws IOException, GeneralSecurityException {
     final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
     Sheets service =
@@ -104,11 +104,11 @@ class SheetsQuickstart {
           service
               .spreadsheets()
               .values()
-              .clear(spreadsheetId, "F" + rowNumber + ":O" + rowNumber, requestBody);
+              .clear(spreadsheetId, "F" + rowNumber, requestBody);
       request.execute();
     }
 
-    List<List<Object>> values = Collections.singletonList(assigneeList);
+    List<List<Object>> values = Collections.singletonList(Collections.singletonList(assigneeList));
 
     if (list.contains(String.valueOf(issueNumber))) {
       rowNumber = list.indexOf(String.valueOf(issueNumber)) + 1;
@@ -156,6 +156,8 @@ class SheetsQuickstart {
               .execute();
       System.out.printf("%d cells updated.", result.getUpdatedCells());
     }
+    System.out.println(" Requested Resource Not Found");
+    new UpdateValuesResponse();
   }
 
   void updateIssueTitle(String spreadSheetId, int issueNumber, String issueTitle)
@@ -183,6 +185,8 @@ class SheetsQuickstart {
               .execute();
       System.out.printf("%d cells updated.", result.getUpdatedCells());
     }
+    System.out.println(" Requested Resource Not Found");
+    new UpdateValuesResponse();
   }
 
   void updateMilestone(String spreadSheetId, int issueNumber, String milestoneTitle)
@@ -212,6 +216,8 @@ class SheetsQuickstart {
               .execute();
       System.out.printf("%d cells updated.", result.getUpdatedCells());
     }
+    System.out.println(" Requested Resource Not Found");
+    new UpdateValuesResponse();
   }
 
   void demilestone(String spreadSheetId, int issueNumber)
@@ -237,9 +243,11 @@ class SheetsQuickstart {
           service.spreadsheets().values().clear(spreadSheetId, "E" + rowNumber, requestBody);
       request.execute();
     }
+    System.out.println(" Requested Resource Not Found");
+    new UpdateValuesResponse();
   }
 
-  void updateLabels(String spreadSheetId, ArrayList labelsList, int issueNumber)
+  void updateLabels(String spreadSheetId, String labels, int issueNumber)
       throws IOException, GeneralSecurityException {
     final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
     Sheets service =
@@ -256,16 +264,12 @@ class SheetsQuickstart {
 
     if (list.contains(String.valueOf(issueNumber))) {
       rowNumber = list.indexOf(String.valueOf(issueNumber)) + 1;
-
       Sheets.Spreadsheets.Values.Clear request =
-          service
-              .spreadsheets()
-              .values()
-              .clear(spreadSheetId, "P" + rowNumber + ":Y" + rowNumber, requestBody);
+          service.spreadsheets().values().clear(spreadSheetId, "G" + rowNumber, requestBody);
       request.execute();
     }
 
-    List<List<Object>> values = Collections.singletonList(labelsList);
+    List<List<Object>> values = Collections.singletonList(Collections.singletonList(labels));
 
     if (list.contains(String.valueOf(issueNumber))) {
       rowNumber = list.indexOf(String.valueOf(issueNumber)) + 1;
@@ -275,7 +279,7 @@ class SheetsQuickstart {
           service
               .spreadsheets()
               .values()
-              .update(spreadSheetId, "P" + rowNumber, body)
+              .update(spreadSheetId, "G" + rowNumber, body)
               .setValueInputOption("RAW")
               .execute();
       System.out.printf("%d cells updated.", result.getUpdatedCells());

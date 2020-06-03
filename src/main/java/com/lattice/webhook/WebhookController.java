@@ -55,12 +55,13 @@ public class WebhookController {
 
       case "unassigned":
         {
-          ArrayList<String> assigneeNames = new ArrayList<>();
           int issueNumber = jsonNode.get("issue").get("number").asInt();
           JsonNode assignees = jsonNode.get("issue").get("assignees");
-          assignees.forEach(assignee -> assigneeNames.add(assignee.get("login").textValue()));
+          StringBuilder assigneeNames = new StringBuilder();
+          assignees.forEach(assignee -> assigneeNames.append(assignee.get("login").textValue()).append(", "));
+          assigneeNames.delete(assigneeNames.length()-2, assigneeNames.length()-1);
           sheetsQuickstart.updateAssignees(
-              spreadSheetId, assigneeNames, issueNumber);
+              spreadSheetId, assigneeNames.toString(), issueNumber);
           return ResponseEntity.ok("Updated Successfully");
         }
 
@@ -107,12 +108,14 @@ public class WebhookController {
       case "unlabeled" :
       case "labeled" :  {
 
-        ArrayList<String> labelsList = new ArrayList<>();
         int issueNumber = jsonNode.get("issue").get("number").asInt();
         JsonNode labels = jsonNode.get("issue").get("labels");
-        labels.forEach(label -> labelsList.add(label.get("name").textValue()));
+        StringBuilder labelsList = new StringBuilder();
+        labels.forEach(assignee -> labelsList.append(assignee.get("name").textValue()).append(", "));
+        labelsList.delete(labelsList.length()-2, labelsList.length()-1);
+
         sheetsQuickstart.updateLabels(
-                spreadSheetId, labelsList, issueNumber);
+                spreadSheetId, labelsList.toString(), issueNumber);
         return ResponseEntity.ok("Updated Successfully");
       }
 
