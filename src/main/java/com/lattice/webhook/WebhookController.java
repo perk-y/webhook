@@ -84,22 +84,24 @@ public class WebhookController {
 
         }
 
+      case "demilestoned":
+
       case "milestoned" :{
         int issueNumber = jsonNode.get("issue").get("number").asInt();
-          String milestoneTitle =
-              "=HYPERLINK(\" "+ issue.get("milestone").get("html_url").asText() + "\",\""
-                      + issue.get("milestone").get("title").asText()  +"\")"
-                  ;
-        sheetsQuickstart.updateMilestone(spreadSheetId, issueNumber, milestoneTitle);
+          try{
+            String milestoneTitle =
+                "=HYPERLINK(\" "
+                    + issue.get("milestone").get("html_url").asText()
+                    + "\",\""
+                    + issue.get("milestone").get("title").asText()
+                    + "\")";
+            sheetsQuickstart.updateMilestone(spreadSheetId, issueNumber, milestoneTitle);
+        }
+          catch (NullPointerException e){
+            sheetsQuickstart.demilestone(spreadSheetId, issueNumber);
+            return ResponseEntity.ok("Updated Successfully");
+          }
         return ResponseEntity.ok("Updated Successfully");
-      }
-
-      case "demilestoned" : {
-
-        int issueNumber = jsonNode.get("issue").get("number").asInt();
-        sheetsQuickstart.demilestone(spreadSheetId, issueNumber);
-        return ResponseEntity.ok("Updated Successfully");
-
       }
 
       case "unlabeled" :
