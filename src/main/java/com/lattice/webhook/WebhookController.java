@@ -77,7 +77,7 @@ public class WebhookController {
         case "edited"  : {
 
             int issueNumber = jsonNode.get("issue").get("number").asInt();
-            String issueTitle = "=HYPERLINK(\""+ issue.get("html_url").asText() + "\"),\""
+            String issueTitle = "=HYPERLINK(\""+ issue.get("html_url").asText() + "\",\""
                     + issue.get("title").asText()  +"\")";
             sheetsQuickstart.updateIssueTitle(spreadSheetId, issueNumber, issueTitle);
             return ResponseEntity.ok("Updated Successfully");
