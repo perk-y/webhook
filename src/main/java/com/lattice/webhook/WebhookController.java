@@ -41,7 +41,7 @@ public class WebhookController {
           issueInfo.add(issue.get("title").asText());
           issueInfo.add(issue.get("user").get("login").asText());
           issueInfo.add(issue.get("state").asText());
-          issueInfo.add(issue.get("repository_url").asText());
+          issueInfo.add(issue.get("html_url").asText());
           sheetsQuickstart.updateValues(
               spreadSheetId, "RAW", issueInfo);
           return ResponseEntity.ok("Updated Successfully");
