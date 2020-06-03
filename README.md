@@ -28,7 +28,10 @@ API used:
  1. [Turn on google sheets API](https://developers.google.com/sheets/api/quickstart/java) and download credentials.json provided.
  2. Place credentials.json in src/main/resources directory.
  3. Change the spreadsheetId field in Webhook controller class to spreadsheet id that you want to update data in.
- 4. Finally, execute the Program by using *gradle bootRun*
+ 4. Execute the Program by using *gradle bootRun*
+ 5. Secondly, go to repository you want updates of. Go to settings of that repository then webhooks. create a webhook and specify the       post request url that you just executed for all issue events and you are all done.
+ 
+ 
  
   
   
