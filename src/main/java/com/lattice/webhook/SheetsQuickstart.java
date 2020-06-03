@@ -101,10 +101,7 @@ class SheetsQuickstart {
       rowNumber = list.indexOf(String.valueOf(issueNumber)) + 1;
 
       Sheets.Spreadsheets.Values.Clear request =
-          service
-              .spreadsheets()
-              .values()
-              .clear(spreadsheetId, "F" + rowNumber, requestBody);
+          service.spreadsheets().values().clear(spreadsheetId, "F" + rowNumber, requestBody);
       request.execute();
     }
 
@@ -125,7 +122,6 @@ class SheetsQuickstart {
       return;
     }
     System.out.println(" Requested Resource Not Found");
-    new UpdateValuesResponse();
   }
 
   void changeIssueState(String spreadSheetId, int issueNumber, String state)
@@ -155,9 +151,9 @@ class SheetsQuickstart {
               .setValueInputOption("RAW")
               .execute();
       System.out.printf("%d cells updated.", result.getUpdatedCells());
+      return;
     }
     System.out.println(" Requested Resource Not Found");
-    new UpdateValuesResponse();
   }
 
   void updateIssueTitle(String spreadSheetId, int issueNumber, String issueTitle)
@@ -184,9 +180,9 @@ class SheetsQuickstart {
               .setValueInputOption("USER_ENTERED")
               .execute();
       System.out.printf("%d cells updated.", result.getUpdatedCells());
+      return;
     }
     System.out.println(" Requested Resource Not Found");
-    new UpdateValuesResponse();
   }
 
   void updateMilestone(String spreadSheetId, int issueNumber, String milestoneTitle)
@@ -215,9 +211,9 @@ class SheetsQuickstart {
               .setValueInputOption("USER_ENTERED")
               .execute();
       System.out.printf("%d cells updated.", result.getUpdatedCells());
+      return;
     }
     System.out.println(" Requested Resource Not Found");
-    new UpdateValuesResponse();
   }
 
   void demilestone(String spreadSheetId, int issueNumber)
@@ -244,7 +240,6 @@ class SheetsQuickstart {
       request.execute();
     }
     System.out.println(" Requested Resource Not Found");
-    new UpdateValuesResponse();
   }
 
   void updateLabels(String spreadSheetId, String labels, int issueNumber)
@@ -286,6 +281,5 @@ class SheetsQuickstart {
       return;
     }
     System.out.println(" Requested Resource Not Found");
-    new UpdateValuesResponse();
   }
 }
