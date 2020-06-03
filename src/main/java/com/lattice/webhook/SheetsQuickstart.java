@@ -19,13 +19,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
-public class SheetsQuickstart {
+class SheetsQuickstart {
   private static final String APPLICATION_NAME = "Google Sheets API Java Quickstart";
   private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
   private static final String TOKENS_DIRECTORY_PATH = "tokens";
@@ -65,20 +62,14 @@ public class SheetsQuickstart {
     return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
   }
 
-
-  public AppendValuesResponse updateValues(
-      String spreadsheetId, String valueInputOption, ArrayList issueInfo)
+  void updateValues(String spreadsheetId, ArrayList issueInfo)
       throws IOException, GeneralSecurityException {
     final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
     Sheets service =
         new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
             .setApplicationName(APPLICATION_NAME)
             .build();
-    List<List<Object>> values =
-        Arrays.asList(
-            issueInfo
-            // Additional rows ...
-            );
+    List<List<Object>> values = Collections.singletonList(issueInfo);
 
     ValueRange body = new ValueRange().setValues(values);
     AppendValuesResponse result =
@@ -86,15 +77,13 @@ public class SheetsQuickstart {
             .spreadsheets()
             .values()
             .append(spreadsheetId, "A2:D", body)
-            .setValueInputOption(valueInputOption)
-            .setInsertDataOption("INSERT_ROWS")
+            .setValueInputOption("RAW")
+            .setInsertDataOption("USER_ENTERED")
             .execute();
     System.out.printf("%d cells updated.", result.getUpdates().getUpdatedCells());
-    return result;
   }
 
-  public UpdateValuesResponse updateAssignees(
-      String spreadsheetId, String valueInputOption, ArrayList assigneeList, int issueNumber)
+  void updateAssignees(String spreadsheetId, ArrayList assigneeList, int issueNumber)
       throws IOException, GeneralSecurityException {
     final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
     Sheets service =
@@ -102,29 +91,25 @@ public class SheetsQuickstart {
             .setApplicationName(APPLICATION_NAME)
             .build();
     List<List<Object>> a =
-            service.spreadsheets().values().get(spreadsheetId, "A:A").execute().getValues();
+        service.spreadsheets().values().get(spreadsheetId, "A:A").execute().getValues();
     ArrayList list =
-            (ArrayList) a.stream().flatMap(value -> value.stream()).collect(Collectors.toList());
+        (ArrayList) a.stream().flatMap(Collection::stream).collect(Collectors.toList());
     int rowNumber;
 
-    if(assigneeList == null || assigneeList.size() == 0 ){
+    ClearValuesRequest requestBody = new ClearValuesRequest();
 
-      ClearValuesRequest requestBody = new ClearValuesRequest();
-
-      if (list.contains(String.valueOf(issueNumber))) {
-        rowNumber = list.indexOf(String.valueOf(issueNumber)) + 1;
+    if (list.contains(String.valueOf(issueNumber))) {
+      rowNumber = list.indexOf(String.valueOf(issueNumber)) + 1;
 
       Sheets.Spreadsheets.Values.Clear request =
-              service.spreadsheets().values().clear(spreadsheetId, "F" + rowNumber, requestBody);
-       request.execute();
-       return new UpdateValuesResponse();
-      }
+          service
+              .spreadsheets()
+              .values()
+              .clear(spreadsheetId, "F" + rowNumber + ":O" + rowNumber, requestBody);
+      request.execute();
     }
-    List<List<Object>> values =
-        Arrays.asList(
-            assigneeList
-            // Additional rows ...
-            );
+
+    List<List<Object>> values = Collections.singletonList(assigneeList);
 
     if (list.contains(String.valueOf(issueNumber))) {
       rowNumber = list.indexOf(String.valueOf(issueNumber)) + 1;
@@ -135,16 +120,16 @@ public class SheetsQuickstart {
               .spreadsheets()
               .values()
               .update(spreadsheetId, "F" + rowNumber, body)
-              .setValueInputOption(valueInputOption)
+              .setValueInputOption("RAW")
               .execute();
       System.out.printf("%d cells updated.", result.getUpdatedCells());
-      return result;
+      return;
     }
     System.out.println(" Requested Resource Not Found");
-    return new UpdateValuesResponse();
+    new UpdateValuesResponse();
   }
 
-  public void changeIssueState(String spreadSheetId, int issueNumber, String state)
+  void changeIssueState(String spreadSheetId, int issueNumber, String state)
       throws IOException, GeneralSecurityException {
 
     final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
@@ -152,11 +137,11 @@ public class SheetsQuickstart {
         new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
             .setApplicationName(APPLICATION_NAME)
             .build();
-    List<List<Object>> values = Arrays.asList(Arrays.asList(state));
+    List<List<Object>> values = Collections.singletonList(Collections.singletonList(state));
     List<List<Object>> a =
         service.spreadsheets().values().get(spreadSheetId, "A:A").execute().getValues();
     ArrayList list =
-        (ArrayList) a.stream().flatMap(value -> value.stream()).collect(Collectors.toList());
+        (ArrayList) a.stream().flatMap(Collection::stream).collect(Collectors.toList());
     int rowNumber;
     System.out.println(Arrays.toString(list.toArray()));
     if (list.contains(String.valueOf(issueNumber))) {
@@ -174,29 +159,130 @@ public class SheetsQuickstart {
     }
   }
 
-    public void updateIssueTitle(String spreadSheetId, int issueNumber, String issueTitle) throws GeneralSecurityException, IOException {
-        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-        Sheets service =
-                new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
-                        .setApplicationName(APPLICATION_NAME)
-                        .build();
-        List<List<Object>> values = Arrays.asList(Arrays.asList(issueTitle));
-        List<List<Object>> a =
-                service.spreadsheets().values().get(spreadSheetId, "A:A").execute().getValues();
-        ArrayList list =
-                (ArrayList) a.stream().flatMap(value -> value.stream()).collect(Collectors.toList());
-        int rowNumber;
-        if (list.contains(String.valueOf(issueNumber))) {
-            rowNumber = list.indexOf(String.valueOf(issueNumber)) + 1;
-            ValueRange body = new ValueRange().setValues(values);
-            UpdateValuesResponse result =
-                    service
-                            .spreadsheets()
-                            .values()
-                            .update(spreadSheetId, "B" + rowNumber, body)
-                            .setValueInputOption("RAW")
-                            .execute();
-            System.out.printf("%d cells updated.", result.getUpdatedCells());
+  void updateIssueTitle(String spreadSheetId, int issueNumber, String issueTitle)
+      throws GeneralSecurityException, IOException {
+    final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+    Sheets service =
+        new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+            .setApplicationName(APPLICATION_NAME)
+            .build();
+    List<List<Object>> values = Collections.singletonList(Collections.singletonList(issueTitle));
+    List<List<Object>> a =
+        service.spreadsheets().values().get(spreadSheetId, "A:A").execute().getValues();
+    ArrayList list =
+        (ArrayList) a.stream().flatMap(Collection::stream).collect(Collectors.toList());
+    int rowNumber;
+    if (list.contains(String.valueOf(issueNumber))) {
+      rowNumber = list.indexOf(String.valueOf(issueNumber)) + 1;
+      ValueRange body = new ValueRange().setValues(values);
+      UpdateValuesResponse result =
+          service
+              .spreadsheets()
+              .values()
+              .update(spreadSheetId, "B" + rowNumber, body)
+              .setValueInputOption("USER_ENTERED")
+              .execute();
+      System.out.printf("%d cells updated.", result.getUpdatedCells());
     }
-}
+  }
+
+  void updateMilestone(String spreadSheetId, int issueNumber, String milestoneTitle)
+      throws GeneralSecurityException, IOException {
+
+    final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+    Sheets service =
+        new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+            .setApplicationName(APPLICATION_NAME)
+            .build();
+    List<List<Object>> values =
+        Collections.singletonList(Collections.singletonList(milestoneTitle));
+    List<List<Object>> a =
+        service.spreadsheets().values().get(spreadSheetId, "A:A").execute().getValues();
+    ArrayList list =
+        (ArrayList) a.stream().flatMap(Collection::stream).collect(Collectors.toList());
+    int rowNumber;
+    if (list.contains(String.valueOf(issueNumber))) {
+      rowNumber = list.indexOf(String.valueOf(issueNumber)) + 1;
+      ValueRange body = new ValueRange().setValues(values);
+      UpdateValuesResponse result =
+          service
+              .spreadsheets()
+              .values()
+              .update(spreadSheetId, "E" + rowNumber, body)
+              .setValueInputOption("USER_ENTERED")
+              .execute();
+      System.out.printf("%d cells updated.", result.getUpdatedCells());
+    }
+  }
+
+  void demilestone(String spreadSheetId, int issueNumber)
+      throws GeneralSecurityException, IOException {
+
+    final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+    Sheets service =
+        new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+            .setApplicationName(APPLICATION_NAME)
+            .build();
+    List<List<Object>> a =
+        service.spreadsheets().values().get(spreadSheetId, "A:A").execute().getValues();
+    ArrayList list =
+        (ArrayList) a.stream().flatMap(Collection::stream).collect(Collectors.toList());
+    int rowNumber;
+
+    ClearValuesRequest requestBody = new ClearValuesRequest();
+
+    if (list.contains(String.valueOf(issueNumber))) {
+      rowNumber = list.indexOf(String.valueOf(issueNumber)) + 1;
+
+      Sheets.Spreadsheets.Values.Clear request =
+          service.spreadsheets().values().clear(spreadSheetId, "E" + rowNumber, requestBody);
+      request.execute();
+    }
+  }
+
+  void updateLabels(String spreadSheetId, ArrayList labelsList, int issueNumber)
+      throws IOException, GeneralSecurityException {
+    final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+    Sheets service =
+        new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+            .setApplicationName(APPLICATION_NAME)
+            .build();
+    List<List<Object>> a =
+        service.spreadsheets().values().get(spreadSheetId, "A:A").execute().getValues();
+    ArrayList list =
+        (ArrayList) a.stream().flatMap(Collection::stream).collect(Collectors.toList());
+    int rowNumber;
+
+    ClearValuesRequest requestBody = new ClearValuesRequest();
+
+    if (list.contains(String.valueOf(issueNumber))) {
+      rowNumber = list.indexOf(String.valueOf(issueNumber)) + 1;
+
+      Sheets.Spreadsheets.Values.Clear request =
+          service
+              .spreadsheets()
+              .values()
+              .clear(spreadSheetId, "P" + rowNumber + ":Y" + rowNumber, requestBody);
+      request.execute();
+    }
+
+    List<List<Object>> values = Collections.singletonList(labelsList);
+
+    if (list.contains(String.valueOf(issueNumber))) {
+      rowNumber = list.indexOf(String.valueOf(issueNumber)) + 1;
+
+      ValueRange body = new ValueRange().setValues(values);
+      UpdateValuesResponse result =
+          service
+              .spreadsheets()
+              .values()
+              .update(spreadSheetId, "P" + rowNumber, body)
+              .setValueInputOption("RAW")
+              .execute();
+      System.out.printf("%d cells updated.", result.getUpdatedCells());
+      return;
+    }
+    System.out.println(" Requested Resource Not Found");
+    new UpdateValuesResponse();
+  }
 }
