@@ -24,7 +24,7 @@ import java.util.ArrayList;
 @RestController
 public class WebhookController {
 
-  String spreadSheetId = "1IQ6cMyDz123GuJEUYWysNt73_UGoYxaBG0idq6xoV3U";
+  private String spreadSheetId = "1IQ6cMyDz123GuJEUYWysNt73_UGoYxaBG0idq6xoV3U";
 
   @PostMapping(value = "/webhook")
   public ResponseEntity<String> webhook(@RequestBody JsonNode jsonNode)
@@ -43,7 +43,7 @@ public class WebhookController {
           issueInfo.add(issue.get("state").asText());
           issueInfo.add(issue.get("repository_url").asText());
           sheetsQuickstart.updateValues(
-              "1IQ6cMyDz123GuJEUYWysNt73_UGoYxaBG0idq6xoV3U", "RAW", issueInfo);
+              spreadSheetId, "RAW", issueInfo);
           return ResponseEntity.ok("Updated Successfully");
         }
 
@@ -56,7 +56,7 @@ public class WebhookController {
           JsonNode assignees = jsonNode.get("issue").get("assignees");
           assignees.forEach(assignee -> assigneeNames.add(assignee.get("login").textValue()));
           sheetsQuickstart.updateAssignees(
-              "1IQ6cMyDz123GuJEUYWysNt73_UGoYxaBG0idq6xoV3U", "RAW", assigneeNames, issueNumber);
+              spreadSheetId, "RAW", assigneeNames, issueNumber);
           return ResponseEntity.ok("Updated Successfully");
         }
 
