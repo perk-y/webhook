@@ -77,8 +77,7 @@ class SheetsQuickstart {
             .spreadsheets()
             .values()
             .append(spreadsheetId, "A2:D", body)
-            .setValueInputOption("RAW")
-            .setInsertDataOption("USER_ENTERED")
+            .setValueInputOption("USER_ENTERED")
             .execute();
     System.out.printf("%d cells updated.", result.getUpdates().getUpdatedCells());
   }

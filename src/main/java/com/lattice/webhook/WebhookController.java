@@ -42,7 +42,7 @@ public class WebhookController {
       case "opened":
         {
           issueInfo.add(issue.get("number").asText());
-          issueInfo.add("=HYPERLINK(\" "+ issue.get("html_url").asText() + ",\""
+          issueInfo.add("=HYPERLINK(\""+ issue.get("html_url").asText() + "\",\""
                   + issue.get("title").asText()  +"\")");
           issueInfo.add(issue.get("user").get("login").asText());
           issueInfo.add(issue.get("state").asText());
@@ -77,7 +77,7 @@ public class WebhookController {
         case "edited"  : {
 
             int issueNumber = jsonNode.get("issue").get("number").asInt();
-            String issueTitle = "=HYPERLINK(\" "+ issue.get("html_url").asText() + ",\""
+            String issueTitle = "=HYPERLINK(\""+ issue.get("html_url").asText() + "\"),\""
                     + issue.get("title").asText()  +"\")";
             sheetsQuickstart.updateIssueTitle(spreadSheetId, issueNumber, issueTitle);
             return ResponseEntity.ok("Updated Successfully");
@@ -87,7 +87,7 @@ public class WebhookController {
       case "milestoned" :{
         int issueNumber = jsonNode.get("issue").get("number").asInt();
           String milestoneTitle =
-              "=HYPERLINK(\" "+ issue.get("milestone").get("html_url").asText() + ",\""
+              "=HYPERLINK(\" "+ issue.get("milestone").get("html_url").asText() + "\",\""
                       + issue.get("milestone").get("title").asText()  +"\")"
                   ;
         sheetsQuickstart.updateMilestone(spreadSheetId, issueNumber, milestoneTitle);
@@ -112,8 +112,6 @@ public class WebhookController {
         sheetsQuickstart.updateLabels(
                 spreadSheetId, labelsList, issueNumber);
         return ResponseEntity.ok("Updated Successfully");
-
-
       }
 
     }
