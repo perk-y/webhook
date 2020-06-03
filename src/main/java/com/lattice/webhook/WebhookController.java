@@ -14,12 +14,12 @@ import java.util.ArrayList;
  * Events: Issue opened, edited, deleted, transferred, pinned, unpinned, closed, reopened, assigned,
  * unassigned, labeled, unlabeled, milestoned, demilestoned, locked, or unlocked.
  * Handled Issues:
- * 1.Opened - Done
- * 2.Closed - Done
- * 3.assigned - Done
- * 4.unassigned - Done TODO: Need to test this case
- * 5.reopened - Done
- * 6.Edited - Done
+ * 1.Opened - Done - Tested
+ * 2.Closed - Done - Tested
+ * 3.assigned - Done - Tested
+ * 4.unassigned - Done -Tested
+ * 5.reopened - Done -Tested
+ * 6.Edited - Done -Tested
  */
 @RestController
 public class WebhookController {
@@ -29,7 +29,6 @@ public class WebhookController {
   @PostMapping(value = "/webhook")
   public ResponseEntity<String> webhook(@RequestBody JsonNode jsonNode)
       throws IOException, GeneralSecurityException {
-    System.out.println("Success");
     String action = jsonNode.get("action").asText();
     JsonNode issue = jsonNode.get("issue");
     ArrayList<String> issueInfo = new ArrayList<>();
@@ -42,7 +41,7 @@ public class WebhookController {
           issueInfo.add(issue.get("title").asText());
           issueInfo.add(issue.get("user").get("login").asText());
           issueInfo.add(issue.get("state").asText());
-          issueInfo.add(issue.get("url").asText());
+          issueInfo.add(issue.get("repository_url").asText());
           sheetsQuickstart.updateValues(
               "1IQ6cMyDz123GuJEUYWysNt73_UGoYxaBG0idq6xoV3U", "RAW", issueInfo);
           return ResponseEntity.ok("Updated Successfully");

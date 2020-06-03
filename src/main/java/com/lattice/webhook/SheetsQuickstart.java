@@ -12,8 +12,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
-import com.google.api.services.sheets.v4.model.AppendValuesResponse;
-import com.google.api.services.sheets.v4.model.ValueRange;
+import com.google.api.services.sheets.v4.model.*;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -119,7 +118,7 @@ public class SheetsQuickstart {
     return result;
   }
 
-  public AppendValuesResponse updateAssignees(
+  public UpdateValuesResponse updateAssignees(
       String spreadsheetId, String valueInputOption, ArrayList assigneeList, int issueNumber)
       throws IOException, GeneralSecurityException {
     final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
@@ -127,33 +126,47 @@ public class SheetsQuickstart {
         new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
             .setApplicationName(APPLICATION_NAME)
             .build();
+    List<List<Object>> a =
+            service.spreadsheets().values().get(spreadsheetId, "A:A").execute().getValues();
+    ArrayList list =
+            (ArrayList) a.stream().flatMap(value -> value.stream()).collect(Collectors.toList());
+    int rowNumber;
+
+    if(assigneeList == null || assigneeList.size() == 0 ){
+
+      ClearValuesRequest requestBody = new ClearValuesRequest();
+
+      if (list.contains(String.valueOf(issueNumber))) {
+        rowNumber = list.indexOf(String.valueOf(issueNumber)) + 1;
+
+      Sheets.Spreadsheets.Values.Clear request =
+              service.spreadsheets().values().clear(spreadsheetId, "F" + rowNumber, requestBody);
+       request.execute();
+       return new UpdateValuesResponse();
+      }
+    }
     List<List<Object>> values =
         Arrays.asList(
             assigneeList
             // Additional rows ...
             );
-    List<List<Object>> a =
-        service.spreadsheets().values().get(spreadsheetId, "A:A").execute().getValues();
-    ArrayList list =
-        (ArrayList) a.stream().flatMap(value -> value.stream()).collect(Collectors.toList());
-    int rowNumber;
+
     if (list.contains(String.valueOf(issueNumber))) {
       rowNumber = list.indexOf(String.valueOf(issueNumber)) + 1;
 
       ValueRange body = new ValueRange().setValues(values);
-      AppendValuesResponse result =
+      UpdateValuesResponse result =
           service
               .spreadsheets()
               .values()
-              .append(spreadsheetId, "F" + rowNumber, body)
+              .update(spreadsheetId, "F" + rowNumber, body)
               .setValueInputOption(valueInputOption)
-              .setInsertDataOption("OVERWRITE")
               .execute();
-      System.out.printf("%d cells updated.", result.getUpdates().getUpdatedCells());
+      System.out.printf("%d cells updated.", result.getUpdatedCells());
       return result;
     }
     System.out.println(" Requested Resource Not Found");
-    return new AppendValuesResponse();
+    return new UpdateValuesResponse();
   }
 
   public void changeIssueState(String spreadSheetId, int issueNumber, String state)
@@ -170,18 +183,19 @@ public class SheetsQuickstart {
     ArrayList list =
         (ArrayList) a.stream().flatMap(value -> value.stream()).collect(Collectors.toList());
     int rowNumber;
+    System.out.println(Arrays.toString(list.toArray()));
     if (list.contains(String.valueOf(issueNumber))) {
       rowNumber = list.indexOf(String.valueOf(issueNumber)) + 1;
+      System.out.println("Row Number" + rowNumber);
       ValueRange body = new ValueRange().setValues(values);
-      AppendValuesResponse result =
+      UpdateValuesResponse result =
           service
               .spreadsheets()
               .values()
-              .append(spreadSheetId, "D" + rowNumber, body)
+              .update(spreadSheetId, "D" + rowNumber, body)
               .setValueInputOption("RAW")
-              .setInsertDataOption("OVERWRITE")
               .execute();
-      System.out.printf("%d cells updated.", result.getUpdates().getUpdatedCells());
+      System.out.printf("%d cells updated.", result.getUpdatedCells());
     }
   }
 
@@ -200,15 +214,14 @@ public class SheetsQuickstart {
         if (list.contains(String.valueOf(issueNumber))) {
             rowNumber = list.indexOf(String.valueOf(issueNumber)) + 1;
             ValueRange body = new ValueRange().setValues(values);
-            AppendValuesResponse result =
+            UpdateValuesResponse result =
                     service
                             .spreadsheets()
                             .values()
-                            .append(spreadSheetId, "B" + rowNumber, body)
+                            .update(spreadSheetId, "B" + rowNumber, body)
                             .setValueInputOption("RAW")
-                            .setInsertDataOption("OVERWRITE")
                             .execute();
-            System.out.printf("%d cells updated.", result.getUpdates().getUpdatedCells());
+            System.out.printf("%d cells updated.", result.getUpdatedCells());
     }
 }
 }
