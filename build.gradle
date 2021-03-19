@@ -38,7 +38,7 @@ dependencies {
 // https://mvnrepository.com/artifact/com.google.oauth-client/google-oauth-client-jetty
 	compile group: 'com.google.oauth-client', name: 'google-oauth-client-jetty', version: '1.31.2'
 // https://mvnrepository.com/artifact/com.google.apis/google-api-services-sheets
-	compile group: 'com.google.apis', name: 'google-api-services-sheets', version: 'v4-rev20201130-1.31.0'
+	compile group: 'com.google.apis', name: 'google-api-services-sheets', version: 'v4-rev20210309-1.31.0'
 }
 
 test {
